@@ -9,6 +9,8 @@ __pycache__/
 *.so
 .Python
 env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -24,12 +26,10 @@ var/
 .installed.cfg
 *.egg
 
-# Virtual Environment
-venv/
-ENV/
-env/
+# Environment variables
+.env
 
-# IDE
+# IDE specific files
 .idea/
 .vscode/
 *.swp
@@ -37,27 +37,18 @@ env/
 
 # Logs
 *.log
-logs/
+
+# Data files (these will be mounted as volumes)
+jira_logger/data/jira_issues/*
+jira_logger/data/jira_raw_responses/*
+!jira_logger/data/jira_issues/__init__.py
+!jira_logger/data/jira_raw_responses/__init__.py
 
 # Docker
-.dockerignore
 Dockerfile
 docker-compose.yml
-
-# Jira issues data
-jira_issues/
-jira_ei_tasks.json
-
-# Google Cloud credentials
-*.json
-!package.json
+.dockerignore
 
 # Documentation
-documentation/
-*.md
-!README.md
-!API_README.md
-
-# Temporary files
-.DS_Store
-Thumbs.db
+README.md
+LICENSE

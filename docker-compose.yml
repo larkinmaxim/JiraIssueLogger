@@ -1,34 +1,38 @@
-version: '3'
+version: '3.8'
 
 services:
-  jira-logger-api:
-    build: .
+  jira-logger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jira-logger
+    restart: unless-stopped
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
-      # Mount Google Cloud credentials if needed
-      # - ${HOME}/.config/gcloud:/root/.config/gcloud
+      - ./jira_logger/data:/app/jira_logger/data
+      - ./.env:/app/.env
     environment:
-      - JIRA_BASE_URL=${JIRA_BASE_URL}
-      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
-      # Uncomment to specify Google Cloud project
-      # - GOOGLE_CLOUD_PROJECT=your-project-id
-    restart: unless-stopped
+      - TZ=UTC
+    command: python jira_logger/run_api.py
+    networks:
+      - jira-logger-network
 
-  # Uncomment to add a scheduler service
-  # scheduler:
-  #   build: .
-  #   volumes:
-  #     - .:/app
-  #     # Mount Google Cloud credentials if needed
-  #     # - ${HOME}/.config/gcloud:/root/.config/gcloud
-  #   environment:
-  #     - JIRA_BASE_URL=${JIRA_BASE_URL}
-  #     - JIRA_API_TOKEN=${JIRA_API_TOKEN}
-  #     # Uncomment to specify Google Cloud project
-  #     # - GOOGLE_CLOUD_PROJECT=your-project-id
-  #   command: python schedule_api_calls.py
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - jira-logger-api
+  jira-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jira-scheduler
+    restart: unless-stopped
+    volumes:
+      - ./jira_logger/data:/app/jira_logger/data
+      - ./.env:/app/.env
+    environment:
+      - TZ=UTC
+    command: python jira_logger/main.py
+    networks:
+      - jira-logger-network
+
+networks:
+  jira-logger-network:
+    driver: bridge

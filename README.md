@@ -1,89 +1,72 @@
-# Jira Logger with BigQuery Integration
+# Jira Logger
 
-A comprehensive solution for tracking Jira issues and storing their details in BigQuery, with automatic duplicate prevention.
-
-## Overview
-
-This project provides a FastAPI application with three main endpoints:
-
-1. **Update Status Endpoint**: Fetches all Jira issues with specified statuses and updates BigQuery
-2. **Collect Closed/Deployed PD Details**: Collects details for issues in "closed" or "deployed pd" status with empty details
-3. **Collect Deployed AC Details**: Collects/updates details for issues in "deployed ac" status
-
-The application prevents duplicates in the BigQuery table by using MERGE operations and selective updates.
+A Python application for logging and tracking Jira issues, with capabilities to store data in Google BigQuery for analytics and reporting.
 
 ## Features
 
-- **Jira Integration**: Connects to Jira API to fetch issue data and status updates
-- **BigQuery Storage**: Stores issue data in BigQuery with a well-defined schema
-- **Duplicate Prevention**: Uses BigQuery MERGE operations to prevent duplicates
-- **Netskope SSL Support**: Includes robust SSL certificate handling for corporate environments
-- **Scheduling Options**: Multiple ways to schedule periodic data collection
-- **Docker Support**: Containerized deployment with Docker and Docker Compose
-- **Comprehensive Documentation**: Detailed guides for deployment and usage
+- Automated Jira issue tracking and data collection
+- Scheduled API calls to Jira for regular updates
+- Data storage in Google BigQuery
+- RESTful API for accessing and managing Jira data
+- SSL certificate handling for secure connections
+
+## Project Structure
+
+```
+jira_logger/
+├── api/                  # API implementation
+├── config/               # Configuration settings
+├── core/                 # Core functionality
+│   ├── bigquery/         # BigQuery integration
+│   └── jira/             # Jira API integration
+├── data/                 # Data storage
+│   ├── jira_issues/      # Processed Jira issues
+│   └── jira_raw_responses/ # Raw Jira API responses
+├── docs/                 # Documentation
+├── scripts/              # Utility scripts
+│   └── test_scripts/     # Testing scripts
+└── utils/                # Utility functions
+```
+
+## Setup
+
+1. Clone the repository
+2. Create a virtual environment: `python -m venv venv`
+3. Activate the virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - Unix/MacOS: `source venv/bin/activate`
+4. Install dependencies: `pip install -r requirements.txt`
+5. Configure environment variables in `.env` file (see `.env.example` for required variables)
+
+## Usage
+
+### Running the API Server
+
+```bash
+python jira_logger/run_api.py
+```
+
+### Saving Jira Responses
+
+```bash
+python jira_logger/scripts/save_jira_responses.py
+```
+
+### Setting up Google Cloud
+
+```bash
+python jira_logger/scripts/setup_google_cloud.py
+```
 
 ## Documentation
 
-- [API Documentation](API_README.md): Detailed information about the API endpoints and usage
-- [Implementation Plan](documentation/implementation_plan.md): Overview of the system architecture and components
-- [Deployment Guide](documentation/deployment_guide.md): Instructions for deploying in different environments
+For more detailed information, refer to the documentation in the `jira_logger/docs/` directory:
 
-## Components
-
-### FastAPI Application
-The core of the system, providing RESTful endpoints for Jira data collection and BigQuery integration.
-
-### Jira API Client
-Reuses and extends the existing Jira API integration code with SSL certificate management.
-
-### BigQuery Integration
-Uses Google Cloud Python client library to store and update Jira issue data.
-
-### Scheduler
-Optional component to trigger the endpoints on a daily basis.
-
-## Quick Start
-
-### Installation
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env
-# Edit .env with your Jira credentials
-
-# Run the API server
-python run_api.py
-```
-
-### Docker Deployment
-
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
-```
-
-### Testing
-
-```bash
-# Test the API endpoints
-python test_api.py
-```
-
-## Original Components
-
-This project builds upon and extends the following original components:
-
-### Netskope Certificate Library
-A standalone utility library for managing Netskope SSL certificates, located in `netskope_certificate.py`.
-
-### Jira Issue Parser
-The original parser for Jira issues with SSL certificate support, now integrated into the FastAPI application.
+- [Product Requirements Document](jira_logger/docs/PRD.md)
+- [Implementation Plan](jira_logger/docs/implementation_plan.md)
+- [Deployment Guide](jira_logger/docs/deployment_guide.md)
+- [API Documentation](jira_logger/docs/api_docs.md)
 
 ## License
-[Specify your license here]
 
-## Contributing
-Contributions are welcome! Please submit pull requests or open issues on the project repository.
+[MIT License](LICENSE)
