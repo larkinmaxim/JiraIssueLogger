@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Jira issues data
+jira_issues/
+jira_ei_tasks.json
+
+# Google Cloud credentials
+*.json
+!package.json
+
+# Documentation
+documentation/
+*.md
+!README.md
+!API_README.md
+
+# Temporary files
+.DS_Store
+Thumbs.db

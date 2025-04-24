@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  jira-logger-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      # Mount Google Cloud credentials if needed
+      # - ${HOME}/.config/gcloud:/root/.config/gcloud
+    environment:
+      - JIRA_BASE_URL=${JIRA_BASE_URL}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      # Uncomment to specify Google Cloud project
+      # - GOOGLE_CLOUD_PROJECT=your-project-id
+    restart: unless-stopped
+
+  # Uncomment to add a scheduler service
+  # scheduler:
+  #   build: .
+  #   volumes:
+  #     - .:/app
+  #     # Mount Google Cloud credentials if needed
+  #     # - ${HOME}/.config/gcloud:/root/.config/gcloud
+  #   environment:
+  #     - JIRA_BASE_URL=${JIRA_BASE_URL}
+  #     - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+  #     # Uncomment to specify Google Cloud project
+  #     # - GOOGLE_CLOUD_PROJECT=your-project-id
+  #   command: python schedule_api_calls.py
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - jira-logger-api

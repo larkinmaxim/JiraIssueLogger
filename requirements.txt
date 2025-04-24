@@ -1,0 +1,8 @@
+requests
+python-dotenv
+pyOpenSSL
+fastapi
+uvicorn
+google-cloud-bigquery
+pydantic
+schedule
