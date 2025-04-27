@@ -25,6 +25,9 @@ from jira_logger.api.middleware import setup_middleware
 from jira_logger.config.environment import configure_environment
 from jira_logger.config.settings import get_settings, get_data_dirs
 
+# Import API endpoints to register them with the app
+import jira_logger.api.endpoints
+
 # Configure environment
 configure_environment()
 
