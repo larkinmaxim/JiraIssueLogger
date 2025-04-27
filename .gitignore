@@ -28,3 +28,6 @@ build/
 # Local data files
 *.db
 *.sqlite3
+
+# Shell scripts
+*.sh

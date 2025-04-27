@@ -70,3 +70,49 @@ For more detailed information, refer to the documentation in the `jira_logger/do
 ## License
 
 [MIT License](LICENSE)
+
+
+## Netskope SSL Interception Configuration
+
+If you are using Netskope for SSL Interception, you need to configure the application to use the Netskope certificate.
+
+### Windows
+
+1. Run the `set_netskope_env.bat` script to set the environment variables:
+
+```batch
+set_netskope_env.bat
+```
+
+2. For Google Cloud SDK, run:
+
+```batch
+gcloud config set core/custom_ca_certs_file "C:\ProgramData\Netskope\STAgent\data\nscacert.pem"
+```
+
+### Linux/Mac
+
+1. Run the `set_netskope_env.sh` script to set the environment variables:
+
+```bash
+source set_netskope_env.sh
+```
+
+2. For Google Cloud SDK, run:
+
+```bash
+gcloud config set core/custom_ca_certs_file 'C:\ProgramData\Netskope\STAgent\data\nscacert.pem'
+```
+
+### Environment Variables
+
+The following environment variables are set by the scripts:
+
+- `REQUESTS_CA_BUNDLE`: Path to the Netskope certificate
+- `SSL_CERT_FILE`: Path to the Netskope certificate
+- `CURL_CA_BUNDLE`: Path to the Netskope certificate
+- `NODE_EXTRA_CA_CERTS`: Path to the Netskope certificate
+- `PYTHONHTTPSVERIFY`: Set to 1 to enable SSL verification
+- `GOOGLE_API_USE_CLIENT_CERTIFICATE`: Set to true to use client certificate
+
+These environment variables are required for the application to work with Netskope SSL Interception.

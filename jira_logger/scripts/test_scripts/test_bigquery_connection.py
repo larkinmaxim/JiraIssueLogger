@@ -10,6 +10,8 @@ import os
 import sys
 import uuid
 import datetime
+import warnings
+import ssl
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 
@@ -53,6 +55,39 @@ def test_bigquery_connection():
     if not check_credentials():
         return False
 
+    # Configure SSL verification with Netskope certificate
+    print("Configuring SSL verification with Netskope certificate...")
+
+    # Define paths for Netskope certificates
+    netskope_cert_paths = [
+        r"C:\ProgramData\Netskope\STAgent\data\nscacert.pem",  # Standard Netskope cert path
+        r"C:\ProgramData\Netskope\STAgent\data\nscacert_combined.pem",  # Combined cert path
+        r"C:\Netskope Certs\rootcaCert.pem",  # Custom cert path
+    ]
+
+    # Find the first certificate that exists
+    netskope_cert_path = None
+    for cert_path in netskope_cert_paths:
+        if os.path.exists(cert_path):
+            netskope_cert_path = cert_path
+            break
+
+    if not netskope_cert_path:
+        print(f"❌ Netskope certificate not found at any of the expected locations:")
+        for cert_path in netskope_cert_paths:
+            print(f"   - {cert_path}")
+        return False
+
+    print(f"✅ Found Netskope certificate at: {netskope_cert_path}")
+
+    # Set environment variables for requests library
+    os.environ["REQUESTS_CA_BUNDLE"] = netskope_cert_path
+    os.environ["SSL_CERT_FILE"] = netskope_cert_path
+    os.environ["CURL_CA_BUNDLE"] = netskope_cert_path
+    os.environ["NODE_EXTRA_CA_CERTS"] = netskope_cert_path
+    os.environ["PYTHONHTTPSVERIFY"] = "1"
+    os.environ["GOOGLE_API_USE_CLIENT_CERTIFICATE"] = "true"
+
     try:
         # Create a BigQuery client
         print_step(1, "Creating BigQuery client")
@@ -61,17 +96,94 @@ def test_bigquery_connection():
         print(f"   Project: {client.project}")
         print(f"   Location: {client.location}")
 
-        # Create a unique dataset ID for testing
-        test_id = uuid.uuid4().hex[:8]
-        dataset_id = f"jira_logger_test_{test_id}"
-        dataset_ref = f"{client.project}.{dataset_id}"
+        # List existing datasets
+        print_step(2, "Listing existing datasets")
+        print(
+            f"   This will verify if we can connect to BigQuery and have proper permissions"
+        )
 
-        # Create a test dataset
-        print_step(2, f"Creating test dataset: {dataset_id}")
-        dataset = bigquery.Dataset(dataset_ref)
-        dataset.location = "US"
-        dataset = client.create_dataset(dataset, timeout=30)
-        print(f"✅ Successfully created dataset: {dataset_id}")
+        try:
+            print(f"   Attempting to list datasets with timeout=10 seconds...")
+            try:
+                # Use a shorter timeout to avoid long waits
+                datasets = list(client.list_datasets(timeout=10))
+
+                if datasets:
+                    print(f"✅ Successfully listed {len(datasets)} datasets:")
+                    for dataset in datasets[
+                        :5
+                    ]:  # Show only first 5 to avoid too much output
+                        print(f"   - {dataset.dataset_id}")
+                    if len(datasets) > 5:
+                        print(f"   ... and {len(datasets) - 5} more")
+                else:
+                    print(f"✅ No datasets found in project {client.project}")
+
+                print(f"\n✅ Basic connection to BigQuery is working!")
+            except Exception as e:
+                print(f"❌ Error listing datasets: {str(e)}")
+                print(f"   Exception type: {type(e).__name__}")
+                print(
+                    f"   This could be due to network issues, permissions, or service availability."
+                )
+
+                # Try to get more information about the error
+                import traceback
+
+                print("\nDetailed error information:")
+                traceback.print_exc()
+
+                # Check network connectivity
+                print("\nChecking network connectivity...")
+                try:
+                    import socket
+
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.settimeout(2)
+                    s.connect(("www.googleapis.com", 443))
+                    s.close()
+                    print("✅ Network connection to googleapis.com is working")
+                except Exception as net_err:
+                    print(f"❌ Network connection error: {str(net_err)}")
+
+                return False
+
+            # Ask if user wants to continue with full test
+            response = input(
+                "\nDo you want to continue with the full test (creating test dataset and tables)? (y/n): "
+            )
+            if response.lower() != "y":
+                print("\nSkipping full test. Basic connection test was successful.")
+                return True
+
+            # Continue with full test if user wants to
+            print("\nContinuing with full test...")
+
+            # Create a unique dataset ID for testing
+            test_id = uuid.uuid4().hex[:8]
+            dataset_id = f"jira_logger_test_{test_id}"
+            dataset_ref = f"{client.project}.{dataset_id}"
+
+            # Create a test dataset
+            print_step(3, f"Creating test dataset: {dataset_id}")
+            dataset = bigquery.Dataset(dataset_ref)
+            dataset.location = "US"
+            print(f"   Attempting to create dataset with timeout=30 seconds...")
+            try:
+                dataset = client.create_dataset(dataset, timeout=30)
+                print(f"✅ Successfully created dataset: {dataset_id}")
+            except Exception as e:
+                print(f"❌ Error creating dataset: {str(e)}")
+                print(
+                    "   This could be due to network issues, permissions, or service availability."
+                )
+                return False
+        except Exception as e:
+            print(f"❌ Error listing datasets: {str(e)}")
+            print(
+                "   This could be due to network issues, permissions, or service availability."
+            )
+            return False
 
         try:
             # Create a test table
