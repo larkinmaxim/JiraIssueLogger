@@ -33,7 +33,15 @@ def call_api_endpoint(endpoint, name):
     """Call an API endpoint and log the result."""
     try:
         logger.info(f"Calling {name} endpoint...")
-        response = requests.post(f"{BASE_URL}/{endpoint}")
+
+        # Import SSL settings
+        from jira_logger.config.settings import get_ssl_settings
+
+        ssl_settings = get_ssl_settings()
+        verify = ssl_settings.get("use_ssl_verification", False)
+
+        # Use SSL settings for the request
+        response = requests.post(f"{BASE_URL}/{endpoint}", verify=verify)
 
         if response.status_code == 200:
             result = response.json()

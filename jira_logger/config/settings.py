@@ -46,7 +46,7 @@ class Settings(BaseSettings):
 
     # SSL settings
     ssl_cert_path: Optional[str] = Field(default=None, env="SSL_CERT_PATH")
-    use_ssl_verification: bool = Field(default=True, env="USE_SSL_VERIFICATION")
+    use_ssl_verification: bool = Field(default=False, env="USE_SSL_VERIFICATION")
 
     # Logging settings
     log_level: str = Field(default="INFO", env="LOG_LEVEL")

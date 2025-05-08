@@ -14,6 +14,7 @@ services:
       - ./.env:/app/.env
     environment:
       - TZ=UTC
+      - USE_SSL_VERIFICATION=false
     command: python jira_logger/run_api.py
     networks:
       - jira-logger-network
@@ -29,6 +30,7 @@ services:
       - ./.env:/app/.env
     environment:
       - TZ=UTC
+      - USE_SSL_VERIFICATION=false
     command: python jira_logger/main.py
     networks:
       - jira-logger-network

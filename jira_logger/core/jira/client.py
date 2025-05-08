@@ -42,13 +42,13 @@ def log(message, level="INFO"):
         print(f"[{level}] {message}")
 
 
-def fetch_jira_issue_data(issue_key, bypass_ssl_verify=True):
+def fetch_jira_issue_data(issue_key, bypass_ssl_verify=None):
     """
     Fetch Jira issue data with expanded changelog
 
     Args:
         issue_key (str): Jira issue key
-        bypass_ssl_verify (bool): SSL verification flag
+        bypass_ssl_verify (bool, optional): SSL verification flag, defaults to settings value
 
     Returns:
         dict: Jira issue data or None if fetch fails
@@ -68,6 +68,14 @@ def fetch_jira_issue_data(issue_key, bypass_ssl_verify=True):
 
     # Find Netskope certificate
     netskope_cert_path = find_netskope_certificate()
+
+    # Get SSL settings if not specified
+    if bypass_ssl_verify is None:
+        # Import here to avoid circular imports
+        from jira_logger.config.settings import get_ssl_settings
+
+        ssl_settings = get_ssl_settings()
+        bypass_ssl_verify = not ssl_settings["use_ssl_verification"]
 
     # Configure SSL verification
     verify, _ = configure_ssl_verification(
