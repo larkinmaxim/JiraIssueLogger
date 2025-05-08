@@ -24,18 +24,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Debug Workload Identity Provider
-      run: |
-        echo "WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}"
-        echo "PROJECT_ID: ${{ env.PROJECT_ID }}"
-
     - name: Google Auth
       id: auth
-      uses: google-github-actions/auth@v1
+      uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
         service_account: github-actions-sa@tp-pmo-production.iam.gserviceaccount.com
-        audience: https://iam.googleapis.com/projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
@@ -51,7 +45,8 @@ jobs:
         docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
 
     - name: Deploy to Cloud Run
-      uses: google-github-actions/deploy-cloudrun@v1
+      id: deploy
+      uses: google-github-actions/deploy-cloudrun@v2
       with:
         service: ${{ env.SERVICE_NAME }}
         region: ${{ env.REGION }}
