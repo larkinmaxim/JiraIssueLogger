@@ -33,11 +33,9 @@ jobs:
       id: auth
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: https://iam.googleapis.com/projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-        project_id: ${{ env.PROJECT_ID }}
-        token_format: 'access_token'
-        create_credentials_file: true
+        workload_identity_provider: projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
+        service_account: github-actions-sa@tp-pmo-production.iam.gserviceaccount.com
+        audience: https://iam.googleapis.com/projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
