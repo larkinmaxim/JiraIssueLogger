@@ -36,7 +36,8 @@ jobs:
         workload_identity_provider: projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
         service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
         project_id: ${{ env.PROJECT_ID }}
-        audience: api://924413780529.apps.googleusercontent.com
+        token_format: 'access_token'
+        create_credentials_file: true
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
