@@ -30,11 +30,10 @@ jobs:
       with:
         workload_identity_provider: projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
         service_account: github-actions-sa@tp-pmo-production.iam.gserviceaccount.com
+        token_format: 'access_token'
 
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ env.PROJECT_ID }}
+      uses: google-github-actions/setup-gcloud@v2
 
     - name: Authorize Docker push
       run: gcloud auth configure-docker
