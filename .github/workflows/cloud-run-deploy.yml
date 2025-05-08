@@ -24,12 +24,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Debug Workload Identity Provider
+      run: |
+        echo "WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}"
+        echo "PROJECT_ID: ${{ env.PROJECT_ID }}"
+
     - name: Google Auth
       id: auth
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: ${{ secrets.WIF_PROVIDER }} # Workload Identity Federation
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }} # Service account email
+        workload_identity_provider: projects/924413780529/locations/global/workloadIdentityPools/github-pool/providers/git
+        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+        project_id: ${{ env.PROJECT_ID }}
+        token_format: 'access_token'
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
